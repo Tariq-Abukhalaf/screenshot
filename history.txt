@@ -1,0 +1,130 @@
+[tested on]
+node --version  v16.17.0
+npm  --version  8.15.0
+git  --version  git version 2.34.1
+
+[hostnamectl]
+ Static hostname: ip-172-31-16-60
+       Icon name: computer-vm
+         Chassis: vm
+      Machine ID: ec2440e5471e6eea2a06d540f99039ac
+         Boot ID: 3c8a04ba70984d65bed686482b604120
+  Virtualization: amazon
+Operating System: Ubuntu 22.04.3 LTS              
+          Kernel: Linux 6.2.0-1012-aws
+    Architecture: arm64
+ Hardware Vendor: Amazon EC2
+  Hardware Model: t4g.medium
+
+[linux]
+sudo apt update 
+sudo apt upgrade
+sudo apt install nano
+sudo apt install net-tools
+
+[node & npm]  
+sudo apt install nodejs
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.35.2/install.sh | bash
+. ~/.nvm/nvm.sh
+nvm install 16.17.0
+node --version
+npm --version
+
+[git] 
+git --version 
+
+[rmq]
+sudo apt install rabbitmq-server
+rabbitmqctl status
+sudo rabbitmq-plugins enable rabbitmq_management
+
+[mongodb]
+sudo apt-get install gnupg curl
+curl -fsSL https://pgp.mongodb.com/server-7.0.asc |    sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg    --dearmor
+echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+echo "mongodb-org hold" | sudo dpkg --set-selections
+echo "mongodb-org-database hold" | sudo dpkg --set-selections
+echo "mongodb-org-server hold" | sudo dpkg --set-selections
+echo "mongodb-mongosh hold" | sudo dpkg --set-selections
+echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+sudo systemctl start mongod
+sudo systemctl status mongod
+sudo systemctl enable mongod
+sudo systemctl stop mongod
+sudo systemctl restart mongod
+mongosh
+
+
+[clone]
+git clone https://github.com/<>
+cd <>
+mv example.env .env 
+npm i
+
+[install chromium &pm2]
+sudo apt-get install chromium-browser
+mkdir screenshots
+npm install pm2 -g
+
+[monitoring]
+pm2 logs
+pm2 monit
+pm2 list 
+
+[bindip] 
+sudo netstat -utpl | grep mongo 
+cd etc
+sudo vim mongod.conf 
+sudo service mongod restart
+sudo service mongod status 
+ 
+[rmq config]
+rabbitmqctl add_user admin admin
+sudo rabbitmqctl add_user admin admin
+sudo rabbitmqctl set_user_tags admin administrator
+sudo rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
+sudo service rabbitmq-server restart
+sudo service rabbitmq-server status 
+
+[reboot]
+sudo reboot
+
+[master pm2] 
+#serve
+1) api end point
+# http://54.173.67.59:8080/jobs?url=https://vashouse.com/&callback=https://icanhazdadjoke.com/&width=600&height=600
+2) dameon to monitor
+ 
+connect through ssh 
+sudo -i
+pm2 list
+pm2 delete all
+pm2 save
+pm2 start index.js --name="api"
+pm2 save
+pm2 start src/daemons/monitorQueue.daemon.js --name="daemon"
+pm2 save
+pm2 startup
+pm2 save
+
+[slave image]
+#serve
+1) consumer 
+2) callback
+
+connect through ssh 
+sudo -i 
+pm2 list 
+pm2 delete all 
+pm2 save 
+pm2 start ecosystem.config.js
+pm2 save 
+pm2 startup
+pm2 save
+go to gui aws ec2 interface then creat image from it , called it for example "slave_image"
+copy the image id and paste it to .env AMI
+
+
