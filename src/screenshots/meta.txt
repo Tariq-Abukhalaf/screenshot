@@ -1,0 +1,1 @@
+this folder for saving pic before uploaded it to s3 bucket
